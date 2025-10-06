@@ -260,14 +260,7 @@ const ChatInterface = () => {
                           <div className="font-semibold text-gray-700 mb-1">
                             {sidx + 1}. {source.title}
                           </div>
-                          <div className="text-gray-600 text-xs mb-2">
-                            {source.abstract.substring(0, 150)}...
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-500">
-                              📅 {source.release_date}
-                            </span>
-                          </div>
+                          
                           {source.link && (
                             <a
                               href={source.link}
