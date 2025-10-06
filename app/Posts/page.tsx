@@ -1,13 +1,16 @@
-// app/page.tsx - Production Version
+// app/page.tsx - Fixed Production Version
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 
+// ✅ FIXED: Added source_type and category
 interface Source {
   title: string;
   abstract: string;
   link: string;
   release_date: string;
+  source_type: string;  // ✅ NEW
+  category: string;     // ✅ NEW
   similarity: number;
 }
 
@@ -27,9 +30,7 @@ const ChatInterface = () => {
   const [selectedModel, setSelectedModel] = useState<"groq" | "gemini">("groq");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Production API URL (HuggingFace Spaces)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://jernihh-magangchatbot-ai.hf.space/api/chat";
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://jernihh-magangchatbot-ai.hf.space";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,20 +121,22 @@ const ChatInterface = () => {
             <button
               onClick={() => setSelectedModel("groq")}
               disabled={loading}
-              className={`w-full text-left text-xs rounded p-2 transition-colors ${selectedModel === "groq"
+              className={`w-full text-left text-xs rounded p-2 transition-colors ${
+                selectedModel === "groq"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-700 hover:bg-gray-600"
-                }`}
+              }`}
             >
               ⚡ Llama 3.1 8B (Groq)
             </button>
             <button
               onClick={() => setSelectedModel("gemini")}
               disabled={loading}
-              className={`w-full text-left text-xs rounded p-2 transition-colors ${selectedModel === "gemini"
+              className={`w-full text-left text-xs rounded p-2 transition-colors ${
+                selectedModel === "gemini"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-700 hover:bg-gray-600"
-                }`}
+              }`}
             >
               ✨ Gemini 2.0 Flash
             </button>
@@ -218,20 +221,23 @@ const ChatInterface = () => {
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-3xl rounded-lg p-4 ${msg.role === "user"
+                className={`max-w-3xl rounded-lg p-4 ${
+                  msg.role === "user"
                     ? "bg-blue-500 text-white"
                     : "bg-white border shadow-sm"
-                  }`}
+                }`}
               >
                 <div
-                  className={`text-sm whitespace-pre-wrap ${msg.role === "user" ? "text-white" : "text-gray-800"
-                    }`}
+                  className={`text-sm whitespace-pre-wrap ${
+                    msg.role === "user" ? "text-white" : "text-gray-800"
+                  }`}
                   dangerouslySetInnerHTML={{ __html: msg.content }}
                 />
 
                 <div
-                  className={`text-xs mt-2 flex justify-between items-center ${msg.role === "user" ? "text-blue-100" : "text-gray-400"
-                    }`}
+                  className={`text-xs mt-2 flex justify-between items-center ${
+                    msg.role === "user" ? "text-blue-100" : "text-gray-400"
+                  }`}
                 >
                   <span>
                     {msg.timestamp.toLocaleTimeString("id-ID", {
@@ -246,6 +252,7 @@ const ChatInterface = () => {
                   )}
                 </div>
 
+                {/* ✅ FIXED: Enhanced source rendering */}
                 {msg.sources && msg.sources.length > 0 && (
                   <div className="mt-4 border-t pt-3">
                     <p className="text-xs font-semibold text-gray-600 mb-2">
@@ -255,27 +262,57 @@ const ChatInterface = () => {
                       {msg.sources.map((source, sidx) => (
                         <div
                           key={sidx}
-                          className="bg-gray-50 rounded p-3 text-xs hover:bg-gray-100"
+                          className="bg-gray-50 rounded p-3 text-xs hover:bg-gray-100 transition-colors border border-gray-200"
                         >
-                          <div className="font-semibold text-gray-700 mb-1">
+                          {/* ✅ NEW: Source Type Badge + Category */}
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            <span className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">
+                              {source.source_type || "📄 Dokumen"}
+                            </span>
+                            {source.category && (
+                              <span className="text-gray-500 text-xs">
+                                • {source.category}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Title */}
+                          <div className="font-semibold text-gray-800 mb-1">
                             {sidx + 1}. {source.title}
                           </div>
-                          <div className="text-gray-600 text-xs mb-2">
-                            {source.abstract.substring(0, 150)}...
+
+                          {/* Abstract */}
+                          <div className="text-gray-600 text-xs mb-2 line-clamp-3">
+                            {source.abstract}
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-500">
-                              📅 {source.release_date}
-                            </span>
+
+                          {/* Metadata */}
+                          <div className="flex justify-between items-center text-gray-500 text-xs mb-2">
+                            <span>📅 {source.release_date}</span>
                           </div>
+
+                          {/* Link */}
                           {source.link && (
                             <a
                               href={source.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-block mt-2 text-blue-500 hover:underline"
+                              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline text-xs font-medium"
                             >
-                              📄 Lihat Dokumen →
+                              📄 Lihat Dokumen
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
                             </a>
                           )}
                         </div>
@@ -330,16 +367,17 @@ const ChatInterface = () => {
             <button
               type="submit"
               disabled={loading || !question.trim()}
-              className={`px-6 py-3 rounded-lg font-medium transition-all ${loading || !question.trim()
+              className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                loading || !question.trim()
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-lg"
-                }`}
+              }`}
             >
               {loading ? "⏳" : "📤"}
             </button>
           </form>
           <p className="text-xs text-center text-gray-400 mt-2">
-            Press Enter to send • INDA v1.0 • Powered by LangChain
+            Press Enter to send • INDA v2.0 • Powered by LangChain
           </p>
         </div>
       </div>
